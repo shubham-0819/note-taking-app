@@ -7,6 +7,7 @@ A simple note-taking application built with Node.js, Express, and MongoDB.
 - [Note-Taking App](#note-taking-app)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
+  - [Requirements](#requirements)
   - [Installation](#installation)
   - [Configuration](#configuration)
   - [Usage](#usage)
@@ -22,22 +23,31 @@ A simple note-taking application built with Node.js, Express, and MongoDB.
 - Comprehensive error handling
 - API documentation with Swagger
 
+## Requirements
+
+* Upgrade to latest node version, I have tested it on node 20 - 22.
+
 ## Installation
 
 1. Clone the repository:
 
    ```sh
    git clone https://github.com/shubham-0819/note-taking-app.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```sh
    cd note-taking-app
    ```
 
-2. Install dependencies:
+3. Install dependenies
 
    ```sh
-   npm install
+      yarn install
    ```
 
-3. Set up environment variables:
+4. Set up environment variables:
 
    Copy the `.env.example` file to `.env` and update the values as needed.
 
@@ -65,8 +75,13 @@ The application can be configured using environment variables. The following var
 
 ## Usage
 
-To start the application in development mode:
+1. To start the application in development mode:
 
-```sh
-npm run dev
-```
+   ```sh
+   yarn run dev
+   ```
+
+2. Run tests:
+   ```sh
+   yarn test
+   ```
