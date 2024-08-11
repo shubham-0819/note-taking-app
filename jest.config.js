@@ -8,5 +8,6 @@ export default {
   coverageReporters: ['text', 'lcov', 'clover', 'html'],
   transform: {
     '^.+\\.js$': 'babel-jest',
-  }
+  },
+  setupFiles: ['./jest.setup.js'],
 };
