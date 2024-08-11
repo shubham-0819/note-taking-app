@@ -11,6 +11,7 @@ A simple note-taking application built with Node.js, Express, and MongoDB.
   - [Installation](#installation)
   - [Configuration](#configuration)
   - [Usage](#usage)
+  - [Swagger Doc](#swagger-doc)
 
 ## Features
 
@@ -59,6 +60,8 @@ A simple note-taking application built with Node.js, Express, and MongoDB.
 
 The application can be configured using environment variables. The following variables are available:
 
+>NOTE: `MONGODB_URL` is must.
+
 - `PORT`: Port number (default: 3000)
 - `MONGODB_URL`: MongoDB connection URL
 - `NODE_ENV`: Environment (development, production, test)
@@ -85,3 +88,6 @@ The application can be configured using environment variables. The following var
    ```sh
    yarn test
    ```
+## Swagger Doc
+
+* Access swagger UI after starting server - /v1/docs
