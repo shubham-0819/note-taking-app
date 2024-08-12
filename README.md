@@ -27,6 +27,7 @@ A simple note-taking application built with Node.js, Express, and MongoDB.
 ## Requirements
 
 * Upgrade to latest node version, I have tested it on node 20 - 22.
+* Make sure yarn is installed `npm install -g yarn`
 
 ## Installation
 

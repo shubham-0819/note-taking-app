@@ -3,9 +3,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Joi from 'joi';
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+ 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const envVarsSchema = Joi.object()
@@ -36,16 +37,11 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
-export default {
+const _envVars ={
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-    options: {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
   },
   jwt: {
     secret: envVars.JWT_SECRET,
@@ -66,3 +62,5 @@ export default {
     from: envVars.EMAIL_FROM,
   },
 };
+
+export default _envVars;

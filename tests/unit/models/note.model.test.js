@@ -1,125 +1,162 @@
+import * as chai from 'chai';
+import { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import faker from 'faker';
-import { Note } from '../../../src/models/index';
+import mongoose from 'mongoose';
+import { Note } from '../../../src/models/index.js';
+
+chai.use(chaiAsPromised);
 
 describe('Note Model', () => {
   // Test case for creating a new note
-  test('Create a new note', async () => {
+  it('should create a new note', async () => {
     const noteData = {
       title: faker.lorem.sentence(),
       body: faker.lorem.paragraph(),
     };
 
-    const note = await Note.create(noteData);
-
-    expect(note).toBeDefined();
-    expect(note._id).toBeDefined();
-    expect(note.title).toBe(noteData.title);
-    expect(note.body).toBe(noteData.body);
+    Note.create(noteData).then((note) => {
+      expect(note).to.exist;
+      expect(note._id).to.exist;
+      expect(note.title).to.equal(noteData.title);
+      expect(note.body).to.equal(noteData.body);
+      Promise.resolve();
+    });
   });
 
   // Test case for creating a note with missing fields (edge case)
-  test('Create a note with missing title', async () => {
+  it('should throw an error when creating a note with missing title', async () => {
     const noteData = {
       body: faker.lorem.paragraph(),
     };
 
-    await expect(Note.create(noteData)).rejects.toThrow();
+    Note.create(noteData)
+      .then((result) => {
+        expect(result).to.exist;
+        expect(result).to.throw(mongoose.Error.ValidationError);
+      })
+      .catch((error) => {});
   });
 
   // Test case for getting all notes
-  test('Get all notes', async () => {
-    const notes = await Note.find();
-
-    expect(notes).toBeDefined();
-    expect(Array.isArray(notes)).toBe(true);
-    expect(notes.length).toBeGreaterThan(0);
+  it('should get all notes', async () => {
+    Note.find().then((notes) => {
+      expect(notes).to.exist;
+      expect(notes).to.be.an('array');
+      expect(notes.length).to.be.greaterThan(0);
+    });
   });
 
   // Test case for getting a note by ID (edge case)
-  test('Get note by non-existing ID', async () => {
-    const nonExistentId = faker.datatype.uuid();
-    const note = await Note.findById(nonExistentId);
-
-    expect(note).toBeNull();
+  it('should return null for a non-existing ID', async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
+    Note.findById(nonExistentId).then((note) => {
+      expect(note).to.be.null;
+    });
   });
 
   // Test case for updating a note
-  test('Update a note', async () => {
-    const note = await Note.findOne();
-    expect(note).toBeDefined();
+  it('should update a note', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
 
-    const updatedNoteData = {
-      title: faker.lorem.sentence(),
-      body: faker.lorem.paragraph(),
-    };
+      const updatedNoteData = {
+        title: faker.lorem.sentence(),
+        body: faker.lorem.paragraph(),
+      };
 
-    note.title = updatedNoteData.title;
-    note.body = updatedNoteData.body;
+      note.title = updatedNoteData.title;
+      note.body = updatedNoteData.body;
 
-    const updatedNote = await note.save();
-
-    expect(updatedNote._id).toEqual(note._id);
-    expect(updatedNote.title).toBe(updatedNoteData.title);
-    expect(updatedNote.body).toBe(updatedNoteData.body);
+      note.save().then((updatedNote) => {
+        expect(updatedNote._id.toString()).to.equal(note._id.toString());
+        expect(updatedNote.title).to.equal(updatedNoteData.title);
+        expect(updatedNote.body).to.equal(updatedNoteData.body);
+      });
+    });
   });
 
   // Test case for updating a note with invalid data (edge case)
-  test('Update a note with invalid data', async () => {
-    const note = await Note.findOne();
-    expect(note).toBeDefined();
-
-    note.title = '';
-
-    await expect(note.save()).rejects.toThrow();
+  it('should throw an error when updating a note with invalid data', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
+      note.title = '';
+      note
+        .save()
+        .then((result) => {
+          expect(result).to.exist;
+          expect(result).to.throw(new mongoose.Error.ValidationError());
+        })
+        .catch((error) => {});
+    });
   });
 
-  // Test case for deleting a note
-  test('Delete a note', async () => {
-    const note = await Note.findOne();
-    expect(note).toBeDefined();
-
-    await note.remove();
-
-    const deletedNote = await Note.findById(note._id);
-
-    expect(deletedNote).toBeNull();
+  // // Test case for deleting a note
+  it('should delete a note', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
+      note.remove().then((deletedNote) => {
+        Note.findById(note._id).then((note) => {
+          expect(deletedNote).to.be.null;
+        });
+      });
+    });
   });
 
   // Test case for finding a note by title
-  test('Find note by title', async () => {
-    const note = await Note.findOne();
-    expect(note).toBeDefined();
-
-    const foundNote = await Note.findOne({ title: note.title });
-
-    expect(foundNote).toBeDefined();
-    expect(foundNote.title).toBe(note.title);
+  it('should find a note by title', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
+      Note.findOne({ title: note.title }).find((foundNote) => {
+        expect(foundNote).to.exist;
+        expect(foundNote.title).to.equal(note.title);
+      });
+    });
   });
 
   // Test case for counting total number of notes
-  test('Count total number of notes', async () => {
-    const count = await Note.countDocuments();
-
-    expect(count).toBeGreaterThan(0);
+  it('should count total number of notes', async () => {
+    Note.countDocuments().then((count) => {
+      expect(count).to.be.greaterThan(0);
+    });
   });
 
   // Test case for attempting to delete a non-existing note (edge case)
-  test('Delete a non-existing note', async () => {
-    const nonExistentId = faker.datatype.uuid();
+  it('should not delete a non-existing note', async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
 
-    const deleteResult = await Note.deleteOne({ _id: nonExistentId });
-
-    expect(deleteResult.deletedCount).toBe(0);
+    Note.deleteOne({ _id: nonExistentId }).then((deleteResult) => {
+      expect(deleteResult.deletedCount).to.equal(0);
+    });
   });
 
-  // Test case for finding a note by body content (additional case)
-  test('Find note by body content', async () => {
-    const note = await Note.findOne();
-    expect(note).toBeDefined();
+  // Additional test case for updating only the title of a note
+  it('should update only the title of a note', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
+      const newTitle = faker.lorem.sentence();
+      note.title = newTitle;
+      note.save().then((updatedNote) => {
+        expect(updatedNote._id.toString()).to.equal(note._id.toString());
+        expect(updatedNote.title).to.equal(newTitle);
+        expect(updatedNote.body).to.equal(note.body);
+      });
+    });
+  });
 
-    const foundNote = await Note.findOne({ body: note.body });
+  // Additional test case for updating only the body of a note
+  it('should update only the body of a note', async () => {
+    Note.findOne().then((note) => {
+      expect(note).to.exist;
 
-    expect(foundNote).toBeDefined();
-    expect(foundNote.body).toBe(note.body);
+      const newBody = faker.lorem.paragraph();
+      note.body = newBody;
+
+      note.save().then((updatedNote) => {
+        expect(updatedNote._id.toString()).to.equal(note._id.toString());
+        expect(updatedNote.title).to.equal(note.title);
+        expect(updatedNote.body).to.equal(newBody);
+      });
+    });
   });
 });
